@@ -37,19 +37,21 @@ const removeMutationListener = editor.registerMutationListener(nodeType, (mutati
     const registeredElements: WeakSet<HTMLElement> = new WeakSet();
     editor.getEditorState().read(() => {
         for (const [key, mutation] of mutations) {
-            const element: null | HTMLElement = editor.getElementByKey(key);
-            if (
             // Updated might be a move, so that might mean a new DOM element
             // is created. In this case, we need to add and event listener too.
-            (mutation === 'created' || mutation === 'updated') &&
-            element !== null &&
-            !registeredElements.has(element)
-            ) {
-                registeredElements.add(element);
-                element.addEventListener('click', (event: Event) => {
-                    alert('Nice!');
-                });
+            if (mutation !== 'created' && mutation !== 'updated') {
+                continue;
             }
+            
+            const element: null | HTMLElement = editor.getElementByKey(key);
+            if (element === null || registeredElements.has(element)) {
+                continue;
+            }
+            
+            registeredElements.add(element);
+            element.addEventListener('click', (event: Event) => {
+                alert('Nice!');
+            });
         }
     });
 });
